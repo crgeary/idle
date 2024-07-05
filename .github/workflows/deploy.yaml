@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      shasum: ${{ steps.shasum.outputs.checksum }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -32,13 +34,33 @@ jobs:
       - name: zip
         run: zip -r dist.zip dist
 
+      - name: generate shasum
+        id: shasum
+        run: |
+          echo "checksum=$(shasum -a 256 dist.zip | awk '{ print $1 }')" >> $GITHUB_OUTPUT
+
+      - name: upload artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.shasum.outputs.checksum }}
+          path: dist.zip
+          retention-days: 1
+
   deploy:
     runs-on: ubuntu-latest
     needs:
       - build
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.shasum }}
+          path: dist.zip
       - name: deploy
-        run: echo "${GITHUB_REF#refs/*/}"
+        run: |
+          echo "${GITHUB_REF#refs/*/}"
+          cat dist.zip
+
       # - name: deploy
       #   uses: josephbmanley/butler-publish-itchio-action@b5f0b072e8b12b731c69f12b5430f594700e0947
       #   env:
