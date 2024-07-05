@@ -12,11 +12,14 @@ jobs:
       artifact-id: ${{ steps.vars.outputs.artifact-id }}
       itch-user: ${{ vars.ITCH_USER || github.repository_owner }}
       itch-game: ${{ vars.ITCH_GAME || steps.vars.outputs.repo-name }}
+      version: ${{ steps.vars.outputs.version }}
     steps:
       - name: setup vars
         id: vars
         run: |
-          echo "artifact-id=dist-${GITHUB_REF#refs/*/}.zip" >> $GITHUB_OUTPUT
+          v="${GITHUB_REF#refs/*/}"
+          echo "version=${v}" >> $GITHUB_OUTPUT
+          echo "artifact-id=dist-${v}.zip" >> $GITHUB_OUTPUT
           echo "repo-name=$(echo \"${{ github.repository }}\" | awk -F / '{ print $2 }')" >> $GITHUB_OUTPUT
 
   build:
