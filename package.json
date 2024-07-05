@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
+    "check": "biome check",
+    "check:ts": "tsc --noEmit",
     "dev": "vite",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +14,7 @@
   "author": "Christopher Geary",
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
   }
