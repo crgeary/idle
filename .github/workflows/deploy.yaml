@@ -75,5 +75,5 @@ jobs:
           ITCH_GAME: ${{ needs.setup.outputs.itch-game }}
           ITCH_USER: ${{ needs.setup.outputs.itch-user }}
           PACKAGE: dist.zip
-          VERSION: "${GITHUB_REF#refs/*/}"
+          VERSION: ${{ needs.setup.outputs.version }}
 
