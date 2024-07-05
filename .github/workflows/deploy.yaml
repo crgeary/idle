@@ -11,12 +11,13 @@ jobs:
     outputs:
       artifact-id: ${{ steps.vars.outputs.artifact-id }}
       itch-user: ${{ vars.ITCH_USER || github.repository_owner }}
-      itch-game: ${{ vars.ITCH_GAME }}
+      itch-game: ${{ vars.ITCH_GAME || steps.vars.outputs.repo-name }}
     steps:
       - name: setup vars
         id: vars
         run: |
           echo "artifact-id=dist-${GITHUB_REF#refs/*/}.zip" >> $GITHUB_OUTPUT
+          echo "repo-name=$(echo \"${{ github.repository }}\" | awk -F / '{ print $2 }')" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -67,7 +68,9 @@ jobs:
         uses: josephbmanley/butler-publish-itchio-action@b5f0b072e8b12b731c69f12b5430f594700e0947
         env:
           BUTLER_CREDENTIALS: ${{ secrets.ITCH_API_KEY }}
-          VERSION: "${GITHUB_REF#refs/*/}"
-          ITCH_USER: ${{ needs.setup.outputs.itch-user }}
-          ITCH_GAME: ${{ needs.setup.outputs.itch-game }}
           CHANNEL: web
+          ITCH_GAME: ${{ needs.setup.outputs.itch-game }}
+          ITCH_USER: ${{ needs.setup.outputs.itch-user }}
+          PACKAGE: dist.zip
+          VERSION: "${GITHUB_REF#refs/*/}"
+
